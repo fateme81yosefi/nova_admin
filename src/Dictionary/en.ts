@@ -171,5 +171,6 @@ export const en: Dictionary = {
   },
   currency: {
     toman: 'Toman',
+    rateNote: 'Prices are converted from API dollars at {rate} toman per dollar.',
   },
 }

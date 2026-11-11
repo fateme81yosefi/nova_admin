@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from '@/Redux/hooks'
 import { loadCatalog, removeProduct } from '@/Redux/productsSlice'
 import { EyeIcon, PencilIcon, TrashIcon } from '@/assets/Icons/ui'
 import { ListToolbar } from '@/Shared/ListToolbar'
+import { RateNote } from '@/Shared/RateNote'
 import { PAGE_SIZE, Pagination } from '@/Shared/Pagination'
 import { EmptyState, ErrorState, LoadingState } from '@/Shared/StateView'
 import { Panel, Table, TableWrap, Thumb } from '@/Shared/table'
@@ -63,6 +64,7 @@ export function ProductsPage() {
           setPage(1)
         }}
       />
+      <RateNote />
       {saveError && !editing ? <Banner>{saveError}</Banner> : null}
       {status === RequestStatus.Error ? (
         <ErrorState title={error || text.common.errorTitle} actionLabel={text.common.retry} onAction={() => dispatch(loadCatalog())} />

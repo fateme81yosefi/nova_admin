@@ -169,6 +169,7 @@ export const fa = {
   },
   currency: {
     toman: 'تومان',
+    rateNote: 'قیمت‌ها از دلار API با نرخ هر دلار {rate} تومان محاسبه شده‌اند.',
   },
 }
 

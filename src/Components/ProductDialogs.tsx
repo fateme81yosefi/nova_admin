@@ -5,6 +5,7 @@ import { useDictionary } from '@/Dictionary/useDictionary'
 import { saveProduct } from '@/Redux/productsSlice'
 import { useAppDispatch, useAppSelector } from '@/Redux/hooks'
 import { Button } from '@/Shared/Button'
+import { RateNote } from '@/Shared/RateNote'
 import { SelectField, TextArea, TextField } from '@/Shared/fields'
 import type { Product } from '@/types/product'
 import { categoryLabel } from '@/Utils/categoryLabel'
@@ -40,6 +41,7 @@ export function ProductView({ product, onClose }: ViewProps) {
           </strong>
           <Badge>{text.products.statusActive}</Badge>
         </Meta>
+        <RateNote />
         <Category>{categoryLabel(product.category, text)}</Category>
         <Description>{product.description}</Description>
         <Actions>
@@ -158,6 +160,7 @@ export function ProductEditor({ product, onClose }: EditProps) {
                     />
                   </Wide>
                 </Grid>
+                <RateNote />
                 <Actions>
                   <Button type="submit" disabled={isSubmitting}>
                     {isSubmitting ? text.productForm.submitting : text.common.save}
