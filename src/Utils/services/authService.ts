@@ -1,18 +1,18 @@
 import type { LoginPayload } from '@/types/auth'
+import { api } from '@/Utils/api/axiosInstance'
 
-function readCredential(name: 'VITE_AUTH_USERNAME' | 'VITE_AUTH_PASSWORD') {
-  const value = import.meta.env[name]
-  if (typeof value !== 'string' || value.length === 0) {
-    throw new Error(`${name} is not set`)
-  }
-  return value
+type LoginResponse = {
+  token?: string
 }
 
 export async function loginRequest(payload: LoginPayload) {
-  const username = readCredential('VITE_AUTH_USERNAME')
-  const password = readCredential('VITE_AUTH_PASSWORD')
-  if (payload.username.trim() !== username || payload.password !== password) {
-    throw new Error('unauthorized')
+  const { data } = await api.post<LoginResponse | string>('/auth/login', {
+    username: payload.username.trim(),
+    password: payload.password,
+  })
+  const token = typeof data === 'string' ? data.trim() : data.token?.trim()
+  if (!token) {
+    throw new Error('missing token')
   }
-  return crypto.randomUUID()
+  return token
 }

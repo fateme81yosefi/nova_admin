@@ -25,7 +25,12 @@ export function setUnauthorizedHandler(handler: UnauthorizedHandler) {
   onUnauthorized = handler
 }
 
+function isLoginRequest(url: string | undefined) {
+  return (url ?? '').includes('/auth/login')
+}
+
 api.interceptors.request.use((config) => {
+  if (isLoginRequest(config.url)) return config
   const session = readSession()
   if (session?.token) {
     config.headers.Authorization = `Bearer ${session.token}`
@@ -36,7 +41,11 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error: unknown) => {
-    if (axios.isAxiosError(error) && error.response?.status === 401) {
+    if (
+      axios.isAxiosError(error) &&
+      error.response?.status === 401 &&
+      !isLoginRequest(error.config?.url)
+    ) {
       onUnauthorized?.()
     }
     return Promise.reject(error)
