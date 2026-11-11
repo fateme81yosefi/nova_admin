@@ -69,7 +69,7 @@ export function useProductForm(onClose: () => void) {
   }
 
   async function acceptFile(file: File | undefined, helpers: ImageHelpers) {
-    if (!file || !file.type.startsWith('image/')) return
+    if (!file || !file.type.startsWith('image/') || file.type === 'image/svg+xml') return
     if (file.size > maxImageBytes) {
       await helpers.setFieldTouched('image', true, false)
       helpers.setFieldError('image', text.validation.imageSize)

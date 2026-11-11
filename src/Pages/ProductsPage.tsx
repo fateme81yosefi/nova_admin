@@ -16,6 +16,7 @@ import { RequestStatus } from '@/types/Enums/requestStatus'
 import type { Product } from '@/types/product'
 import { categoryLabel } from '@/Utils/categoryLabel'
 import { formatToman } from '@/Utils/formatPrice'
+import { safeImageUrl } from '@/Utils/isHttpUrl'
 
 export function ProductsPage() {
   const text = useDictionary()
@@ -89,7 +90,7 @@ export function ProductsPage() {
                 {rows.map((product) => (
                   <tr key={product.id}>
                     <td>
-                      <Thumb src={product.image} alt="" />
+                      <Thumb src={safeImageUrl(product.image) ?? undefined} alt="" />
                     </td>
                     <td>
                       <Title title={product.title}>{product.title}</Title>

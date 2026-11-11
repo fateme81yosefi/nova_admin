@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { Form, Formik } from 'formik'
 import { ThemeMode } from '@/types/Enums/theme'
-import { isHttpUrl } from '@/Utils/isHttpUrl'
+import { safeImageUrl } from '@/Utils/isHttpUrl'
 import { productSchema } from '@/Validations/productSchema'
 import { palette } from './product/palette'
 import { ProductForm } from './product/ProductForm'
@@ -32,7 +32,7 @@ export function ProductModal({ onClose }: ProductModalProps) {
 
         <Formik initialValues={emptyProductValues} validationSchema={productSchema(form.text.validation)} onSubmit={form.submit}>
           {({ values, errors, touched, handleChange, handleBlur, setFieldValue, setFieldError, setFieldTouched }) => {
-            const preview = values.localImage || (isHttpUrl(values.image) ? values.image.trim() : '')
+            const preview = safeImageUrl(values.localImage) || safeImageUrl(values.image) || ''
             const showPreview = preview !== '' && preview !== form.brokenPreview
 
             return (

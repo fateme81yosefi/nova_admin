@@ -26,7 +26,7 @@ export function productSchema(text: Dictionary['validation']) {
       .trim()
       .test('image', text.url, function (value) {
         const localImage = String((this.parent as ProductFormValues).localImage ?? '')
-        if (localImage.startsWith('data:image/')) return true
+        if (localImage.toLowerCase().startsWith('data:image/') && !localImage.toLowerCase().startsWith('data:image/svg')) return true
         if (!value) return this.createError({ message: text.required })
         if (!isImageSource(value)) return this.createError({ message: text.url })
         return true

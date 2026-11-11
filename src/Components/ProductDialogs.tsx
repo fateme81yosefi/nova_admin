@@ -11,6 +11,7 @@ import type { Product } from '@/types/product'
 import { categoryLabel } from '@/Utils/categoryLabel'
 import { USD_TO_TOMAN, formatToman, tomanToUsd } from '@/Utils/formatPrice'
 import { parseLocalizedNumber } from '@/Utils/localizeDigits'
+import { safeImageUrl } from '@/Utils/isHttpUrl'
 import { productEditSchema } from '@/Validations/productSchema'
 
 type ViewProps = {
@@ -33,7 +34,7 @@ export function ProductView({ product, onClose }: ViewProps) {
   return (
     <Overlay onClick={onClose}>
       <Dialog role="dialog" aria-modal="true" aria-labelledby="product-view-title" onClick={(event) => event.stopPropagation()}>
-        <Preview src={product.image} alt="" />
+        <Preview src={safeImageUrl(product.image) ?? undefined} alt="" />
         <h2 id="product-view-title">{product.title}</h2>
         <Meta>
           <strong>

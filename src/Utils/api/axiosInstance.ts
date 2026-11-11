@@ -12,6 +12,7 @@ function readBaseUrl() {
 export const api = axios.create({
   baseURL: readBaseUrl(),
   timeout: 15000,
+  withCredentials: false,
   headers: {
     Accept: 'application/json',
   },

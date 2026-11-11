@@ -27,7 +27,7 @@ export function ProductPreview({ preview, showPreview, fileRef, onPick, onBroken
           </>
         )}
       </Picker>
-      <FileInput ref={fileRef} type="file" accept="image/*" onChange={onFile} />
+      <FileInput ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={onFile} />
     </PickerSlot>
   )
 }
