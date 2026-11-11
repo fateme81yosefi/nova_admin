@@ -10,6 +10,10 @@ export type UserFormValues = {
   phone: string
 }
 
+export function userEditSchema(text: Dictionary['validation']) {
+  return userSchema(text).omit(['password'])
+}
+
 export function userSchema(text: Dictionary['validation']) {
   return yup.object({
     firstname: yup.string().trim().required(text.required).min(2, text.min3),

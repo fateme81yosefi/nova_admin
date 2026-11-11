@@ -19,3 +19,16 @@ export async function createProduct(payload: ProductPayload) {
     id: data.id ?? Date.now(),
   }
 }
+
+export async function updateProduct(id: number, payload: ProductPayload) {
+  const { data } = await api.put<Product>(`/products/${id}`, payload)
+  return {
+    ...payload,
+    ...data,
+    id,
+  }
+}
+
+export async function deleteProduct(id: number) {
+  await api.delete(`/products/${id}`)
+}

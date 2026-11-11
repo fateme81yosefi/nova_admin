@@ -9,7 +9,11 @@ import { ThemeMode } from '@/types/Enums/theme'
 export function AppProviders({ children }: { children: ReactNode }) {
   const mode = useAppSelector((state) => state.ui.theme)
   const language = useAppSelector((state) => state.ui.language)
-  const theme = mode === ThemeMode.Dark ? darkTheme : lightTheme
+  const colors = mode === ThemeMode.Dark ? darkTheme : lightTheme
+  const theme = {
+    ...colors,
+    direction: language === Language.Fa ? ('rtl' as const) : ('ltr' as const),
+  }
 
   useEffect(() => {
     document.documentElement.lang = language

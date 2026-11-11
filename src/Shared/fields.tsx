@@ -61,7 +61,6 @@ export function SelectField({ label, error, placeholder, options, ...props }: Se
     </Field>
   )
 }
-
 const Field = styled.label`
   display: grid;
   gap: 6px;
@@ -116,3 +115,4 @@ const ErrorText = styled.small`
   color: ${({ theme }) => theme.danger};
   font-size: 12px;
 `
+

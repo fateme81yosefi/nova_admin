@@ -3,7 +3,7 @@ import { ProductCategory } from '@/types/Enums/productCategory'
 import { RequestStatus } from '@/types/Enums/requestStatus'
 import type { Product, ProductPayload } from '@/types/product'
 import { getErrorMessage } from '@/Utils/getErrorMessage'
-import { createProduct, getCategories, getProducts } from '@/Utils/services/productService'
+import { createProduct, deleteProduct, getCategories, getProducts, updateProduct } from '@/Utils/services/productService'
 
 type Catalog = {
   products: Product[]
@@ -66,6 +66,32 @@ export const addProduct = createAsyncThunk<Product, ProductPayload, { rejectValu
   },
 )
 
+export const saveProduct = createAsyncThunk<
+  Product,
+  { id: number; payload: ProductPayload; local?: boolean },
+  { rejectValue: string }
+>('products/save', async ({ id, payload, local }, { rejectWithValue }) => {
+  try {
+    if (local) return { ...payload, id, local: true }
+    const saved = await updateProduct(id, payload)
+    return { ...saved, id }
+  } catch (error) {
+    return rejectWithValue(getErrorMessage(error))
+  }
+})
+
+export const removeProduct = createAsyncThunk<number, { id: number; local?: boolean }, { rejectValue: string }>(
+  'products/remove',
+  async ({ id, local }, { rejectWithValue }) => {
+    try {
+      if (!local) await deleteProduct(id)
+      return id
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error))
+    }
+  },
+)
+
 const productsSlice = createSlice({
   name: 'products',
   initialState,
@@ -98,9 +124,35 @@ const productsSlice = createSlice({
         state.saving = false
         // FakeStore برای هر POST همان id را برمی‌گرداند
         const id = state.items.some((item) => item.id === action.payload.id) ? Date.now() : action.payload.id
-        state.items = [{ ...action.payload, id }, ...state.items]
+        state.items = [{ ...action.payload, id, local: true }, ...state.items]
       })
       .addCase(addProduct.rejected, (state, action) => {
+        state.saving = false
+        state.saveError = action.payload ?? ''
+      })
+      .addCase(saveProduct.pending, (state) => {
+        state.saving = true
+        state.saveError = null
+      })
+      .addCase(saveProduct.fulfilled, (state, action) => {
+        state.saving = false
+        state.items = state.items.map((item) =>
+          item.id === action.payload.id ? { ...item, ...action.payload, local: item.local } : item,
+        )
+      })
+      .addCase(saveProduct.rejected, (state, action) => {
+        state.saving = false
+        state.saveError = action.payload ?? ''
+      })
+      .addCase(removeProduct.pending, (state) => {
+        state.saving = true
+        state.saveError = null
+      })
+      .addCase(removeProduct.fulfilled, (state, action) => {
+        state.saving = false
+        state.items = state.items.filter((item) => item.id !== action.payload)
+      })
+      .addCase(removeProduct.rejected, (state, action) => {
         state.saving = false
         state.saveError = action.payload ?? ''
       })

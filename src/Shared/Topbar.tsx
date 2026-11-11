@@ -1,112 +1,152 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
+import { Avatar, BellIcon, MenuIcon } from '@/assets/Icons/ui'
 import { useDictionary } from '@/Dictionary/useDictionary'
-import { ConfirmModal } from '@/Modals/ConfirmModal'
-import { logout } from '@/Redux/authSlice'
-import { useAppDispatch, useAppSelector } from '@/Redux/hooks'
-import { setLanguage, setTheme } from '@/Redux/uiSlice'
-import { Button } from '@/Shared/Button'
-import { Language } from '@/types/Enums/language'
-import { RoutePath } from '@/types/Enums/routes'
-import { ThemeMode } from '@/types/Enums/theme'
 
-export function Topbar() {
+type TopbarProps = {
+  menuOpen: boolean
+  onMenu: () => void
+}
+
+export function Topbar({ menuOpen, onMenu }: TopbarProps) {
   const text = useDictionary()
-  const dispatch = useAppDispatch()
-  const navigate = useNavigate()
-  const username = useAppSelector((state) => state.auth.username)
-  const theme = useAppSelector((state) => state.ui.theme)
-  const language = useAppSelector((state) => state.ui.language)
-  const [confirming, setConfirming] = useState(false)
+  const [notesOpen, setNotesOpen] = useState(false)
+  const [unread, setUnread] = useState(true)
+  const notesRef = useRef<HTMLDivElement>(null)
 
-  const themeLabel = theme === ThemeMode.Light ? text.theme.toDark : text.theme.toLight
+  useEffect(() => {
+    if (!notesOpen) return
+    function onPointer(event: MouseEvent) {
+      if (!notesRef.current?.contains(event.target as Node)) setNotesOpen(false)
+    }
+    function onKey(event: KeyboardEvent) {
+      if (event.key === 'Escape') setNotesOpen(false)
+    }
+    document.addEventListener('mousedown', onPointer)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onPointer)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [notesOpen])
 
-  function confirmLogout() {
-    dispatch(logout())
-    setConfirming(false)
-    navigate(RoutePath.Login)
+  function toggleNotes() {
+    setNotesOpen((value) => !value)
+    setUnread(false)
   }
 
   return (
     <Bar>
-      <User>{username}</User>
-      <Actions>
-        <LangGroup aria-label={text.language.label}>
-          <LangButton
-            type="button"
-            $active={language === Language.Fa}
-            onClick={() => dispatch(setLanguage(Language.Fa))}
-          >
-            {text.language.fa}
-          </LangButton>
-          <LangButton
-            type="button"
-            $active={language === Language.En}
-            onClick={() => dispatch(setLanguage(Language.En))}
-          >
-            {text.language.en}
-          </LangButton>
-        </LangGroup>
-        <Button
-          variant="ghost"
-          onClick={() => dispatch(setTheme(theme === ThemeMode.Light ? ThemeMode.Dark : ThemeMode.Light))}
-        >
-          {themeLabel}
-        </Button>
-        <Button variant="ghost" onClick={() => setConfirming(true)}>
-          {text.logoutModal.confirm}
-        </Button>
-      </Actions>
-      {confirming ? (
-        <ConfirmModal
-          title={text.logoutModal.title}
-          text={text.logoutModal.text}
-          confirmLabel={text.logoutModal.confirm}
-          cancelLabel={text.logoutModal.cancel}
-          onConfirm={confirmLogout}
-          onClose={() => setConfirming(false)}
-        />
-      ) : null}
+      <Tools>
+        <IconButton type="button" aria-label={text.common.menu} aria-expanded={menuOpen} onClick={onMenu}>
+          <MenuIcon />
+        </IconButton>
+        <Notes ref={notesRef}>
+          <IconButton type="button" aria-label={text.notifications.label} aria-expanded={notesOpen} onClick={toggleNotes}>
+            <BellIcon />
+            {unread ? <Dot /> : null}
+          </IconButton>
+          {notesOpen ? (
+            <NoteList>
+              <NoteTitle>{text.notifications.label}</NoteTitle>
+              <p>{text.notifications.welcome}</p>
+            </NoteList>
+          ) : null}
+        </Notes>
+      </Tools>
+      <Hello>
+        <span>{text.account.welcome}</span>
+        <Avatar />
+      </Hello>
     </Bar>
   )
 }
 
 const Bar = styled.header`
+  direction: ltr;
   height: 72px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 0 28px;
+  padding: 0 22px;
   background: ${({ theme }) => theme.surface};
-  border-bottom: 1px solid ${({ theme }) => theme.border};
 `
 
-const User = styled.span`
-  font-weight: 700;
-`
-
-const Actions = styled.div`
+const Tools = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
 `
 
-const LangGroup = styled.div`
+const Hello = styled.div`
   display: flex;
-  padding: 3px;
-  border: 1px solid ${({ theme }) => theme.border};
-  border-radius: 12px;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.text};
 `
 
-const LangButton = styled.button<{ $active: boolean }>`
+const IconButton = styled.button`
+  position: relative;
+  width: 40px;
+  height: 40px;
   border: 0;
-  background: ${({ theme, $active }) => ($active ? theme.accent : 'transparent')};
-  color: ${({ theme, $active }) => ($active ? theme.onAccent : theme.text)};
-  border-radius: 9px;
-  min-width: 40px;
-  height: 32px;
+  border-radius: 12px;
+  background: transparent;
+  color: ${({ theme }) => theme.text};
+  display: grid;
+  place-items: center;
   cursor: pointer;
-  font-weight: 700;
+
+  &:hover {
+    background: ${({ theme }) => theme.surfaceMuted};
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.accent};
+    outline-offset: 2px;
+  }
+`
+
+const Dot = styled.span`
+  position: absolute;
+  top: 8px;
+  right: 9px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: ${({ theme }) => theme.danger};
+  box-shadow: 0 0 0 2px ${({ theme }) => theme.surface};
+`
+
+const Notes = styled.div`
+  position: relative;
+`
+
+const NoteList = styled.div`
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 260px;
+  padding: 14px;
+  border-radius: 14px;
+  background: ${({ theme }) => theme.surface};
+  color: ${({ theme }) => theme.text};
+  box-shadow: ${({ theme }) => theme.shadow};
+  border: 1px solid ${({ theme }) => theme.border};
+  direction: ${({ theme }) => theme.direction};
+  text-align: start;
+  z-index: 5;
+
+  p {
+    margin: 0;
+    color: ${({ theme }) => theme.muted};
+    line-height: 1.7;
+  }
+`
+
+const NoteTitle = styled.strong`
+  display: block;
+  margin-bottom: 6px;
 `

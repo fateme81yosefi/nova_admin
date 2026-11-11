@@ -6,12 +6,15 @@ import { useAppDispatch, useAppSelector } from '@/Redux/hooks'
 import { loadCatalog } from '@/Redux/productsSlice'
 import { loadUsers } from '@/Redux/usersSlice'
 import { RequestStatus } from '@/types/Enums/requestStatus'
+import { Language } from '@/types/Enums/language'
 import { RoutePath } from '@/types/Enums/routes'
+import { localizeDigits } from '@/Utils/localizeDigits'
 
 export function DashboardPage() {
   const text = useDictionary()
   const dispatch = useAppDispatch()
   const username = useAppSelector((state) => state.auth.username)
+  const language = useAppSelector((state) => state.ui.language)
   const products = useAppSelector((state) => state.products)
   const users = useAppSelector((state) => state.users)
 
@@ -26,16 +29,15 @@ export function DashboardPage() {
         {text.dashboard.greeting}
         {username ? ` ${username}` : ''}
       </h1>
-      <Lead>{text.dashboard.text}</Lead>
       <Grid>
         <Card>
           <span>{text.dashboard.products}</span>
-          <strong>{countLabel(products.status, products.items.length)}</strong>
+          <strong>{countLabel(products.status, products.items.length, language)}</strong>
           <Link to={RoutePath.Products}>{text.dashboard.goProducts}</Link>
         </Card>
         <Card>
           <span>{text.dashboard.users}</span>
-          <strong>{countLabel(users.status, users.items.length)}</strong>
+          <strong>{countLabel(users.status, users.items.length, language)}</strong>
           <Link to={RoutePath.Users}>{text.dashboard.goUsers}</Link>
         </Card>
       </Grid>
@@ -43,21 +45,15 @@ export function DashboardPage() {
   )
 }
 
-function countLabel(status: RequestStatus, count: number) {
-  if (status === RequestStatus.Success) return String(count)
+function countLabel(status: RequestStatus, count: number, language: Language) {
+  if (status === RequestStatus.Success) return localizeDigits(count, language)
   if (status === RequestStatus.Error) return '—'
   return '...'
 }
 
-const Lead = styled.p`
-  max-width: 620px;
-  color: ${({ theme }) => theme.muted};
-  line-height: 1.8;
-`
-
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 280px));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 280px));
   gap: 14px;
 `
 
