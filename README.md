@@ -19,6 +19,28 @@ npm run dev
 - username: `yosefi`
 - password: `12345678`
 
+## صفحه‌ها
+
+فهرست محصولات، با قیمت تومان و صفحه‌بندی.
+
+![فهرست محصولات](docs/screenshots/products.jpg)
+
+مودال افزودن محصول.
+
+![افزودن محصول](docs/screenshots/add-product.jpg)
+
+فهرست کاربران.
+
+![فهرست کاربران](docs/screenshots/users.jpg)
+
+همان فهرست با زبان انگلیسی و تم تیره.
+
+![کاربران با تم تیره](docs/screenshots/users-dark.jpg)
+
+فرم کاربر جدید.
+
+![کاربر جدید](docs/screenshots/new-user.jpg)
+
 ## چی کجاست
 
 ساختار پوشه‌ها همان چیزی است که توی سند خواسته شده بود.
